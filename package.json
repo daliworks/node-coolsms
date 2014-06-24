@@ -1,0 +1,24 @@
+{
+  "name": "node-coolsms",
+  "description": "node-coolsms",
+  "version": "0.0.1",
+  "author": "Daliworks <dev@daliworks.net>",
+  "keywords": [
+    "coolsms",
+    "sms",
+    "text",
+    "mobile"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/daliworks/node-coolsms.git"
+  },
+  "dependencies": {
+    "lodash": "~2.4.1",
+    "request": "~2.36.0"
+  },
+  "main": "index",
+  "engines": {
+    "node": ">= 0.8.0"
+  }
+}
