@@ -18,7 +18,7 @@ API_SECRET, API_KEY;
 
 function getAuth() {
   var salt = genId(),
-  now = _.now()/1000,
+  now = Math.floor(_.now()/1000),
   sig = crypto.createHmac('md5', API_SECRET).update(now + salt).digest('hex');
 
   return {
