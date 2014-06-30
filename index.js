@@ -53,10 +53,12 @@ _.each(['status', 'sent', 'balance'], function (cmd) {
     request.get({
       url: [API_BASE, cmd].join('/'),
       qs: getAuth(),
+      json: true,
     }, function (err, res, body) {
-      var jsonBody = body;
-      try { jsonBody = body && JSON.parse(body); } catch (e) { }
-      return cb && cb(err, jsonBody);
+      if (res.statusCode >= 300 || res.statusCode < 200) {
+        return cb && cb(new Error(body && body.code));
+      }
+      return cb && cb(err, body);
     });
   };
 });
@@ -67,10 +69,12 @@ exports.send = function (body, cb) {
   }
   request.post({
     url: API_BASE + '/send',
+    json: true,
     form: _.defaults(body, getAuth()),
   }, function (err, res, body) {
-    var jsonBody = body;
-    try { jsonBody = body && JSON.parse(body); } catch (e) { }
-    return cb && cb(err, jsonBody);
+    if (res.statusCode >= 300 || res.statusCode < 200) {
+      return cb && cb(new Error(body && body.code));
+    }
+    return cb && cb(err, body);
   });
 };
