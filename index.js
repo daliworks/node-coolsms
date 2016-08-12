@@ -3,8 +3,10 @@
 'use strict';
 
 var request = require('request'),
-crypto = require('crypto'),
-_ = require('lodash');
+    crypto = require('crypto'),
+    _ = require('lodash');
+
+var DEFAULT_REQUEST_TIMEOUT = 10 * 1000; // 10 seconds in milliseconds
 
 function genId(len) {
   if (!len) { len = 6; } //default 6: ~68G
@@ -13,8 +15,9 @@ function genId(len) {
   .slice(0, len);
 }
 
-var API_BASE = 'https://api.coolsms.co.kr/1',
-API_SECRET, API_KEY;
+var API_BASE = 'https://api.coolsms.co.kr/sms/1.5',
+    API_SECRET, API_KEY;
+var requestTimeout = DEFAULT_REQUEST_TIMEOUT;
 
 function getAuth() {
   var salt = genId(),
@@ -46,17 +49,19 @@ exports.init = function (config, cb) {
   }
   API_SECRET = config.secret;
   API_KEY = config.key;
+  requestTimeout = config.requestTimeout || DEFAULT_REQUEST_TIMEOUT;
 };
 
-_.each(['status', 'sent', 'balance'], function (cmd) {
+_.forEach(['status', 'sent', 'balance'], function (cmd) {
   exports[cmd] =  function (cb) {
     request.get({
       url: [API_BASE, cmd].join('/'),
       qs: getAuth(),
       json: true,
+      timeout: requestTimeout
     }, function (err, res, body) {
-      if (res.statusCode >= 300 || res.statusCode < 200) {
-        return cb && cb(new Error(body && body.code));
+      if (res && res.statusCode >= 300 || res && res.statusCode < 200) {
+        return cb && cb(new Error(body && body.result_code));
       }
       return cb && cb(err, body);
     });
@@ -71,9 +76,10 @@ exports.send = function (body, cb) {
     url: API_BASE + '/send',
     json: true,
     form: _.defaults(body, getAuth()),
+    timeout: requestTimeout
   }, function (err, res, body) {
-    if (res.statusCode >= 300 || res.statusCode < 200) {
-      return cb && cb(new Error(body && body.code));
+    if (res && res.statusCode >= 300 || res && res.statusCode < 200) {
+      return cb && cb(new Error(body && body.result_code));
     }
     return cb && cb(err, body);
   });
