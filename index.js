@@ -61,7 +61,7 @@ _.forEach(['status', 'sent', 'balance'], function (cmd) {
       timeout: requestTimeout
     }, function (err, res, body) {
       if (res && res.statusCode >= 300 || res && res.statusCode < 200) {
-        return cb && cb(new Error(body && body.result_code));
+        return cb && cb(new Error(body && body.code));
       }
       return cb && cb(err, body);
     });
@@ -79,7 +79,7 @@ exports.send = function (body, cb) {
     timeout: requestTimeout
   }, function (err, res, body) {
     if (res && res.statusCode >= 300 || res && res.statusCode < 200) {
-      return cb && cb(new Error(body && body.result_code));
+      return cb && cb(new Error(body && body.code));
     }
     return cb && cb(err, body);
   });
