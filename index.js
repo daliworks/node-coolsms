@@ -73,16 +73,18 @@ _.forEach(['status', 'sent', 'balance'], function (cmd) {
 });
 
 exports.send = function (body, cb) {
-  if (body.type === 'SMS' && getTextLength(body.text) > 90) {
+  var clonedBody = _.cloneDeep(body);
+
+  if (clonedBody.type === 'SMS' && getTextLength(clonedBody.text) > 90) {
     return cb && cb(new Error('too long SMS messge'));
   }
 
-  body.to = getNumberWithZeroPrefix(body.to);
+  clonedBody.to = getNumberWithZeroPrefix(clonedBody.to);
 
   request.post({
     url: API_BASE + '/send',
     json: true,
-    form: _.defaults(body, getAuth()),
+    form: _.defaults(clonedBody, getAuth()),
     timeout: requestTimeout
   }, function (err, res, body) {
     if (res && res.statusCode >= 300 || res && res.statusCode < 200) {
