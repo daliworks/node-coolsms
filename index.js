@@ -43,6 +43,10 @@ function getTextLength(str) {
   return len;
 }
 
+function getNumberWithZeroPrefix(number) {
+  return _.startsWith(number, '0') ? number : '0' + number;
+}
+
 exports.init = function (config, cb) {
   if (!config.secret || !config.key) {
     return cb && cb(new Error('secret or key is missing'));
@@ -72,6 +76,9 @@ exports.send = function (body, cb) {
   if (body.type === 'SMS' && getTextLength(body.text) > 90) {
     return cb && cb(new Error('too long SMS messge'));
   }
+
+  body.to = getNumberWithZeroPrefix(body.to);
+
   request.post({
     url: API_BASE + '/send',
     json: true,
